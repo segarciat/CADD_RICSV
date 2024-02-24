@@ -1,0 +1,23 @@
+CompanionAssets
+*.aux
+*.log
+*synctex.gz
+db/
+incremental_db/
+incremental_db/README
+simulation/
+output_files
+*.qpf
+*.qsf
+*.qws
+*.vhd.bak
+*.rpt
+.qsys_edit
+# *.*
+# CompanionAssets
+# incremental_db
+# simulation
+# !*.pdf
+# !*.tex
+# !**/*/images/*
+# !*.c
