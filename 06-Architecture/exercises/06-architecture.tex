@@ -1,0 +1,514 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Welcome to the MAT320 Homework template on Overleaf -- just edit your
+% LaTeX on the left, and we'll compile it for you on the right.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% --------------------------------------------------------------
+% Based on a homework template by Dana Ernst.
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{textcomp} % cent symbol, such as \textcent
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtools} % ceiling function
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+% https://tex.stackexchange.com/questions/146306/how-to-make-horizontal-lists
+\usepackage[inline]{enumitem} % allows using letters in enumerate list environment
+
+% source: https://stackoverflow.com/questions/3175105/inserting-code-in-this-latex-document-with-indentation
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=VHDL, % language for code listing
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=4
+}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newenvironment{ex}[2][Exercise]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{sol}[1][Solution]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+
+
+\begin{document}
+
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+\noindent Sergio Garcia Tapia \hfill
+
+\noindent{\small Digital Design and Computer Architecture: RISC-V, by
+Sarah and David Harris} \hfill
+
+\noindent{\small Chapter 6: Architecture} \hfill 
+
+\noindent\today
+
+\begin{ex}{6.1}
+	Give three examples from the RISC-V architecture of each of the following design principles:
+	(1) regularity supports simplicity; (2) make the common case fast; (3) smaller is faster;
+	and (4) good design demands good compromises. Explain how each of your examples exhibits
+	the design principle.
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\arabic*)]
+		\item In Section 6.2.1,  the \texttt{add} and \texttt{sub} instructions were
+		introduced, and they both have the same format: \texttt{mnemonic source1 source1 destination}.
+		The format is consistent with nearly all RISC-V binary operations, making them predictable
+		and their binary encoding consistent and simple. For example, the \textbf{func7} bits are
+		all 0 for all binary operations with an \texttt{op} code of 51; they differ only in their
+		\texttt{funct3} control bits. Another example is that operands all 32 bits in RISC-V 32,
+		in contrast with x86-32 where operands can be 8-bit, 16-bit, or 32-bit. Also instructions
+		in x86-64 vary in size, whereas in RISC-V they are uniformly 16 bits, as mentioned
+		in Section 6.8.5.
+		\item As discussed in 6.2.1, RISC-V has a relatively small set of simple instructions
+		that are commonly used, in contrast with CISC architectures that provide complex operations
+		and therefore add overhead to simple instructions. In Section 6.8.6, the author mentions
+		that x86 contains string operations that are usually slower than performing the equivalent
+		operation with a series of simple instructions. By supporting simple byte operations that
+		are fast, RISC-V can reap these benefits.
+		\item RISC-V32 has 32 registers, which are sufficient to perform several operations
+		without having to add local variables to the stack in the case of small functions.
+		Since the stack relies on larger memory, accessing is slower, so avoiding this is best.
+		\item In Section 6.4, the author mentions compromise regarding the length of the
+		instruction encoding; some instructions do not require 32 bits, but they are encoded
+		as such anyway to support simplicity. Moreover, instead of a single instruction format,
+		there are four to provide enough flexibility. Another example is the bit-swizzling of
+		the immediate encodings discussed in 6.4.5. Though complicated, it ensures that other
+		instruction fields are consistent and simple.
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.2}
+	The RISC-V architecture has a register set that consists of 32 32-bit registers. Is it possible
+	to design a computer architecture without a register set? If so, briefly describe the architecture,
+	including the instruction set. What are the advantages and disadvantages of this architecture
+	over the RISC-V architecture?
+\end{ex}
+
+\begin{sol}
+	\
+	According to Section 6.2.2, registers exist to support access to operands quickly so that
+	they can run fast; they do this by providing a small address space. Therefore, it is possible
+	to not use a register set and use memory. One way would be to reserve the first 32 address
+	locations of memory for the same functions as the corresponding registers.
+	According to Section 5.5.4, memory is commonly implemented with DRAM, whereas a register set is
+	implemented with SRAM. DRAM latency is longer than SRAM because its bitline is  not actively
+	driven by a transistor; it fundamentally has lower throughput because data must be refreshed
+	periodically and after a read. Moreover, latency and throughput depend on memory size, an
+	therefore since DRAM is typically very large in comparison to a small register set, this means
+	relying on just memory would be too slow. One advantage is that it generally takes less
+	transistors to build DRAM in comparison to SRAM, making them cheaper and less power hungry.
+\end{sol}
+
+\begin{ex}{6.3}
+	Write the following strings using ASCII encoding. Write your final answers in hexadecimal.
+	\begin{enumerate}[label=(\alph*)]
+		\item hello there
+		\item bag o'chips
+		\item To the rescue!
+	\end{enumerate}
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item Referring to an ASCII take encoding, we see that the encoding is:
+		\begin{center}
+			\begin{tabular}{c|ccccccccccc}
+				HEX & \texttt{68} &\texttt{65} & \texttt{6c} &\texttt{6c} &\texttt{6f} & \texttt{20}&
+				\texttt{74} & \texttt{68} & \texttt{65} & \texttt{72} & \texttt{65}\\
+				\hline
+				String & h & e & l &l & o & {} & t & h & e & r & e
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{c|ccccccccccc}
+				HEX & \texttt{62} & \texttt{61} & \texttt{67} & \texttt{20} & \texttt{27} & \texttt{6f}
+				& \texttt{63} & \texttt{68} & \texttt{69} & \texttt{70} & \texttt{73}\\
+				\hline
+				String & b & a & g & {} & o & ' & c & h & i & p & s
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{c|cccccccccccccc}
+				HEX & \texttt{54} & \texttt{6f} & \texttt{20} & \texttt{74} & \texttt{68}& \texttt{65}
+				& \texttt{20} & \texttt{72} & \texttt{65} & \texttt{73} & \texttt{63} & \texttt{75}
+				& \texttt{65} & \texttt{21}\\
+				\hline
+				String & T & o & {} & t & h & e & {} & r & e & s & c & u & e & !
+			\end{tabular}
+		\end{center}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.4}
+	Repeat Exercise 6.3 for the following strings.
+	\begin{enumerate}
+		\item Cool
+		\item RISC-V
+		\item boo!
+	\end{enumerate}
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{c|cccc}
+				HEX & \texttt{43} & \texttt{6f} & \texttt{6f} & \texttt{6c}\\
+				\hline
+				String & \texttt{C} & \texttt{o} & \texttt{o} & \texttt{l}
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{c|cccccc}
+				HEX & \texttt{52} & \texttt{49} & \texttt{53} & \texttt{43} & \texttt{2d} & \texttt{56}\\
+				\hline
+				String & R & I & S & C & - & V
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{c|cccc}
+				HEX & \texttt{62} & \texttt{6f} & \texttt{6f} & \texttt{21}\\
+				\hline
+				String & b & o & o & !
+			\end{tabular}
+		\end{center}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.5}
+	Show how the strings in Exercise 6.3 are stored in byte-addressable memory starting at memory address
+	\texttt{0x004F05BC}. The first character of the string is stored at the lowest byte address (in this
+	case, \texttt{0x004F05BC}). Clearly indicate the memory address of each byte.
+\end{ex}
+
+\begin{sol}
+	\
+	I am using  word addresses that increase upwards. The last character is therefore at the top.
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+			\multicolumn{2}{c}{hello there}\\
+			\hline
+			Byte & Word Address\\
+			\hline
+			\texttt{65} & \texttt{0x004F05C6}\\
+			\texttt{72} & \texttt{0x004F05C5}\\
+			\texttt{65} & \texttt{0x004F05C4}\\
+			\texttt{68} & \texttt{0x004F05C3}\\
+			\texttt{74} & \texttt{0x004F05C2}\\
+			\texttt{20} & \texttt{0x004F05C1}\\
+			\texttt{6f}	& \texttt{0x004F05C0}\\
+			\texttt{6c} & \texttt{0x004F05BF}\\
+			\texttt{6c} & \texttt{0x004F05BE}\\
+			\texttt{65} & \texttt{0x004F05BD}\\
+			\texttt{68}	& \texttt{0x004F05BC}
+			\end{tabular}
+		\end{center}
+		\item
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+				\multicolumn{2}{c}{bag o'chips}\\
+				\hline
+				Byte & Word Address\\
+				\hline
+				\texttt{73} & \texttt{0x004F05C6}\\
+				\texttt{70} & \texttt{0x004F05C5}\\
+				\texttt{69} & \texttt{0x004F05C4} \\
+				\texttt{68} & \texttt{0x004F05C3}\\
+				\texttt{63} & \texttt{0x004F05C2}\\
+				\texttt{6f} & \texttt{0x004F05C1}\\
+				\texttt{27}	& \texttt{0x004F05C0}\\
+				\texttt{20} & \texttt{0x004F05BF}\\
+				\texttt{67} & \texttt{0x004F05BE}\\
+				\texttt{61} & \texttt{0x004F05BD}\\
+				\texttt{62}	& \texttt{0x004F05BC}
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+				\multicolumn{2}{c}{To the rescue!}\\
+				\hline
+				Byte & Word Address\\
+				\hline
+				\texttt{21} & \texttt{0x004F05C9}\\
+				\texttt{65} & \texttt{0x004F05C8}\\
+				\texttt{75} & \texttt{0x004F05C7}\\
+				\texttt{63} & \texttt{0x004F05CD}\\
+				\texttt{73} & \texttt{0x004F05C5}\\
+				\texttt{65} & \texttt{0x004F05C4}\\
+				\texttt{72} & \texttt{0x004F05C3}\\
+				\texttt{20} & \texttt{0x004F05C2}\\
+				\texttt{65} & \texttt{0x004F05C1}\\
+				\texttt{68} & \texttt{0x004F05C0}\\
+				\texttt{74} & \texttt{0x004F05BF}\\
+				\texttt{20} & \texttt{0x004F05BE}\\
+				\texttt{6f} & \texttt{0x004F05BD}\\
+				\texttt{54} & \texttt{0x004F05BC}
+			\end{tabular}
+		\end{center}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.5}
+	Repeat Exercise 6.5 for the strings in Exercise 6.4.
+\end{ex}
+
+\begin{sol}
+	\
+	As in Exercise 6.5, I am using  word addresses that increase upwards. The last character is therefore at the top.
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+				\multicolumn{2}{c}{Cool}\\
+				\hline
+				Byte & Word Address\\
+				\hline
+				\texttt{6c} & \texttt{0x004F05BF}\\
+				\texttt{6f} & \texttt{0x004F05BE}\\
+				\texttt{6f} & \texttt{0x004F05BD}\\
+				\texttt{43} & \texttt{0x004F05BC}
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+				\multicolumn{2}{c}{RISC-V}\\
+				\hline
+				Byte & Word Address\\
+				\hline
+				\texttt{56} & \texttt{0x004F05C1}\\
+				\texttt{2d} & \texttt{0x004F05C0}\\
+				\texttt{43} & \texttt{0x004F05BF}\\
+				\texttt{53} & \texttt{0x004F05BE}\\
+				\texttt{49} & \texttt{0x004F05BD}\\
+				\texttt{52} & \texttt{0x004F05BC}
+			\end{tabular}
+		\end{center}
+		\item 
+		\
+		\begin{center}
+			\begin{tabular}{cc}
+				\multicolumn{2}{c}{boo!}\\
+				\hline
+				Byte & Word Address\\
+				\hline
+				\texttt{21} & \texttt{0x004F05C3}\\
+				\texttt{6f} & \texttt{0x004F05C2}\\
+				\texttt{6f} & \texttt{0x004F05C1}\\
+				\texttt{62} & \texttt{0x004F05C0}
+			\end{tabular}
+		\end{center}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.7}
+	The \texttt{nor} instruction is not a part of the RISC-V instruction set because the same
+	fucntionality can be implemented using existing instructions. Write a short assembly
+	code snippet that has the same functionality: \texttt{s3 = s4 NOR s5}. Use as few instructions
+	as possible.
+\end{ex}
+
+\begin{sol}
+	\
+	Recall that NOR is short for NOT OR, so $A$ NOR $B$ means $\overline{A+B}$, where $+$ is the
+	OR operator and the overline is the NOT operator. The truth table is below:
+	\begin{center}
+		\begin{tabular}{cc|c}
+			A & B & $\overline{A+B}$\\
+			\hline
+			0 & 0 & 1\\
+			0 & 1 & 0\\
+			1 & 0 & 0\\
+			1 & 1 & 0
+		\end{tabular}
+	\end{center}
+	Recalling that NOT can be implemented with \texttt{xori} with \texttt{-1} as the immediate,
+	do precisely an OR followed by a NOT:
+	\begin{lstlisting}[language={}]
+or s6, s4, s5
+xori s3, s6, -1
+	\end{lstlisting}
+\end{sol}
+
+\begin{ex}{6.8}
+	The \texttt{nand} instruction is not a part of the RISC-V instruction set because the same
+	fucntionality can be implemented using existing instructions. Write a short assembly
+	code snippet that has the same functionality: \texttt{s3 = s4 NAND s5}. Use as few instructions
+	as possible.
+\end{ex}
+
+\begin{sol}
+	\
+	Recall that NAND is short for NOT AND, so $A$ NAND $B$ means $\overline{A\cdot B}$, where $\cdot$ is the
+	AND operator and the overline is the NOT operator. The truth table is below:
+	\begin{center}
+		\begin{tabular}{cc|c}
+			A & B & $\overline{A\cdot B}$\\
+			\hline
+			0 & 0 & 1\\
+			0 & 1 & 1\\
+			1 & 0 & 1\\
+			1 & 1 & 0
+		\end{tabular}
+	\end{center}
+	Recalling that NOT can be implemented with \texttt{xori} with \texttt{-1} as the immediate,
+	do precisely an AND followed by a NOT:
+	\begin{lstlisting}[language={}]
+and s6, s4, s5
+xori s3, s6, -1
+	\end{lstlisting}
+\end{sol}
+
+\begin{ex}{6.9}
+	Convert the following high-level code snippets into RISC-V assembly language. Assume that the (signed)
+	integer variables \texttt{g} and \texttt{h} are in register \texttt{a0} and \texttt{a1}, respectively.
+	Clearly comment your code:
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{lstlisting}
+if (g > h)
+	g = g + 1;
+else
+	h = h - 1;
+		\end{lstlisting}
+		\item
+		\
+		\begin{lstlisting}
+if (g <= h)
+	g = 0;
+else
+	h = 0;
+		\end{lstlisting}
+	\end{enumerate}
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item We can use a conditional jump, \texttt{bge}, to go to the \texttt{else} branch when \texttt{h >= g}.
+		To ensure we do not execute the \texttt{else} branch if we take the \texttt{if} branch, we use
+		an unconditional jump with the \texttt{j} instruction to the label after the last instruction in the
+		\texttt{else} branch. To add the constant, we can use the \texttt{addi} command. The assembly follows:
+		\begin{lstlisting}[language={}]
+	bge		a1, a0		// if h >= g goto else at .L1
+	addi	a0, a0,  1	// g = g + 1
+	j .L2				// Skip else branch
+.L1: 
+	addi	a1, a1, -1,	// h = h - 1
+.L2:
+		\end{lstlisting}
+		\item We can use \texttt{blt} to go to the \texttt{else} branch if \texttt{h > g} (equivalently,
+		\texttt{g > h}).
+		\begin{lstlisting}[language={}]
+	blt		a1, a0		// if h < h goto else at .L1
+	addi 	a0, zero, 0	// g = 0
+	j .L2				// Skip else branch
+.L1:
+	addi	a1, zero, 0 // h = 0
+.L2:
+		\end{lstlisting}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.10}
+	Repeat Exercise 6.9 for the following code snippets:
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{lstlisting}
+if (g >= h)
+	g = g + h;
+else
+	g = g - h;
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}
+if (g < h)
+	h = h + 1;
+else
+	h = h * 2;
+		\end{lstlisting}
+	\end{enumerate}
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item
+		\
+		\begin{lstlisting}[language={}]
+		blt		a1, a0		// if h < g goto else at .L1
+		add		a0, a0,  a1	// g = g + h
+		j .L2				// Skip else branch
+.L1: 
+		sub		a0, a0,	a1,	// g = g - h
+.L2:
+	\end{lstlisting}
+		\item Instead of multiplying by 2 with the \texttt{mul} instruction, I used \texttt{sll} to shift left by
+		1 bit, which is equivalent.
+		\begin{lstlisting}[language={}]
+		bge		a0, a1		// if g >= h goto else at .L1
+		addi	a1, a1,  1	// h = h + 1
+		j .L2				// Skip else branch
+.L1: 
+		sll		a1, a1,	1	// h = h * 2
+.L2:
+		\end{lstlisting}
+	\end{enumerate}
+\end{sol}
+
+
+\end{document}
