@@ -1025,4 +1025,361 @@ else:
 		\texttt{factorial(2)} saw. The code results in an infinite loop.
 	\end{enumerate}
 \end{sol}
+
+\begin{ex}{6.22}
+	Convert the following RISC-V assembly code into machine language. Write the
+	instruction in hexadecimal.
+	\begin{lstlisting}[language={}]
+addi	s3,	s4,	28
+sll		t1,	t2,	t3
+srli	s3,	s1,	14
+sw		s9,	16(t4)
+	\end{lstlisting}
+\end{ex}
+
+\begin{sol}
+	\
+	The \texttt{addi} instructions is of $I$-type, which has the format
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}
+			\multicolumn{5}{c}{I-Type}\\
+			\hline
+			$\text{imm}_{11:0}$ & rs1 & funt3 & rd & op\\
+			\hline
+			12 bits & 5 bits & 3 bits & 5 bits & 7 bits\\
+			\hline
+		\end{tabular}
+	\end{center}
+	The opcode and function field for
+	\texttt{addi} are $\textbf{op}=19(\texttt{0010011}_2)$, and  
+	$\textbf{funct}_3=0(\texttt{000}_2)$. The source register is $\texttt{s4}=\texttt{x20}$,
+	so $\texttt{rs1} = 20 (\texttt{10100}_2)$, and the destination register is
+	\texttt{s3} so $\texttt{rd}=19(\texttt{10011}_2)$. Finally, we can represent
+	\texttt{28} as a 12-bit immediate with the encoding $\texttt{000000011100}_2$.
+	Altogether the encoding is
+	\[\texttt{0000 0001 1100 1010 0000 1001 1001 0011}_2=\texttt{0x01CA0993}\]
+	Next, \texttt{sll} is of $R$-type, which has the format:
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\multicolumn{6}{c}{R-type}\\
+			\hline
+			funct7 & rs2 & rs1 & funct3 & rd & op\\
+			\hline
+			7 bits & 5 bits & 5 bits & 3 bits & 5 bits & 7 bits\\
+			\hline
+		\end{tabular}
+	\end{center}
+	For \texttt{sll} we have $\textbf{opcode}=\texttt{0110011}_2$,
+	$\textbf{funct3}=\texttt{001}_2$, and $\textbf{funct7}=\texttt{0000000}_2$.
+	Here, \texttt{t2 = x7} and \texttt{t3 = x28} are source registers \textbf{rs1}
+	and \textbf{rs2}, respectively, and \texttt{t3 = x6}. So $\textbf{rs1}=\texttt{00111}_2$, $\textbf{rs2}=\texttt{11100}_2$, and $\textbf{rd}=\text{00110}_2$. The full
+	encoding is:
+	\[
+	\texttt{0000 0001 1100 0011 1001 0011 0011 0011}_2=\texttt{0x01C39333}
+	\]
+	Next, \texttt{srli} is of $I$-type. It has $\textbf{opcode}=\texttt{0010011}_2$ and
+	$\textbf{func3}=\texttt{101}_2$. The destination is \texttt{s3 = x19} and
+	the source is \texttt{s1 = x9}, so $\textbf{rd}=\texttt{10011}_2$, and
+	$\textbf{rs1}=\texttt{10001}_2$. The immediate is $14=\texttt{000000001110}_2$. The
+	encoding is
+	\[
+	\texttt{0000 0000 1110 1000 1101 1001 1001 0011}_2=\texttt{0x00E8D993}
+	\]
+	Finally we consider \texttt{sw} of $S$-type, which has format:
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\multicolumn{6}{c}{S-type}\\
+			\hline
+			$\text{imm}_{11:5}$ & rs2 & rs1 & funct3 & $\text{imm}_{4:0}$ & op\\
+			\hline
+			7 bits & 5 bits & 5 bits & 3 bits & 5 bits & 7 bits\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\texttt{sw} has $\textbf{opcode}=\texttt{0100011}_2$ and $\textbf{funct3}=\texttt{010}_2$.
+	Moreover, \texttt{s9 = x25} and \texttt{t4 = x29} are source registers rs2 and rs1,
+	respectively. Therefore $\textbf{rs2}=\texttt{11001}_2$	and $\textbf{rs1}=\texttt{11101}_2$.
+	The immediate is $\texttt{16}$, so we have $\textbf{imm}_{4:0} = \texttt{10000}_2$ and
+	$\textbf{imm}_{11:5}=\texttt{0000000}_2$.
+	The encoding is:
+	\[
+	\texttt{0000 0001 1001 1110 1010 1000 0010 0011}_2=\texttt{0x019EA823}
+	\]
+	The translation for all four instructions is:
+	\begin{lstlisting}[language={}]
+0x01CA0993 # addi	s3,	s4,	28
+0x01C39333 # sll	t1,	t2,t3
+0x00E8D993 # srli	s3,	s1,	14
+0x019EA823 # sw	s9,	16(t4)
+	\end{lstlisting}
+\end{sol}
+
+\begin{ex}{6.23}
+	Repeat Exercise 6.22 for the following RISC-V assembly code:
+	\begin{lstlisting}[language={}]
+add		s7,	s8,	s9
+srai	t0,	t1,	0xC
+ori		s3,	s1,	0xABC
+lw		s4,	0x5C(t3)
+	\end{lstlisting}
+\end{ex}
+
+\begin{sol}
+	\
+	\texttt{add} is of $R$-type. It has $\textbf{opcode}=\texttt{0110011}_2$,
+	$\textbf{funct7}=\texttt{0000000}_2$, $\textbf{funct3}=\texttt{000}_2$.
+	The instruction has source registers \texttt{s8 = x24} and \texttt{s9 = x25},
+	and destination register \texttt{s7 = x23}. Therefore we have $\textbf{rs1}=
+	\texttt{11000}_2$, $\textbf{rs2}=\texttt{11001}_2$, and $\textbf{rd}=\texttt{10111}_2$.
+	The encoding is
+	\[
+	\texttt{0000 0001 1001 1100 0000 1011 1011 0011}_2=\texttt{0x019C0BB3}
+	\]
+	Next, \texttt{srai} is of $I$-type. It has $\textbf{opcode}=\texttt{0010011}_2$
+	and $\textbf{funct3}=\texttt{101}_2$. The instruction has destination
+	\texttt{t0 = x5} and source \texttt{t1 = x6}, so $\textbf{rd}=\texttt{00101}_2$
+	and $\textbf{rs1}=\texttt{00110}_2$. Finally the immediate is \texttt{0xC},
+	so $\textbf{imm}_{11:0}=\texttt{000000001100}_2$. The full instruction encoding is
+	\[
+	\texttt{0000 0000 1100 0011 0101 0010 1001 0011}_2=\texttt{0x00C35293}
+	\]
+	Next, \texttt{ori} is also of $I$-type. It has $\textbf{opcode}=\texttt{0010011}_2$
+	and $\textbf{funct3}=\texttt{110}_2$. The instruction has destination
+	\texttt{s3 = x19} and source \texttt{s1 = x9}, so $\textbf{rd}=\texttt{10011}_2$
+	and $\textbf{rs1}=\texttt{10001}_2$. Finally, the immediate is \texttt{0xABC},
+	so $\textbf{imm}_{11:0}=\texttt{1010 1011 1100}_2$. The encoding is
+	\[
+	\texttt{1010 1011 1100 1000 1110 1001 1001 0011}_2=\texttt{0xABC8E993}
+	\]
+	Finally, \texttt{lw} is of $I$-type. It has $\textbf{opcode}=\texttt{0000011}_2$
+	and $\textbf{funct3}=\texttt{010}_2$. The instruction has destination
+	\textbf{s4 = x20} and source \textbf{t3 = x28}, so $\textbf{rd}=\texttt{10100}_2$
+	and $\textbf{rs1}=\texttt{11100}_2$. Finally, the immediate is \texttt{0x5C},
+	so $\textbf{imm}_{11:0}=\texttt{0000 0100 1100}_2$. The encoding is
+	\[
+	\texttt{0000 0100 1100 1110 0010 1010 0000 0011}_2=\texttt{0x04CE2A03}
+	\]
+	The translation for all four instructions is:
+	\begin{lstlisting}[language={}]
+0x019C0BB3 # add	s7,	s8,	s9
+0x00C35293 # srai	t0,	t1,	0xC
+0xABC8E993 # ori	s3,	s1,	0xABC
+0x04CE2A03 # lw	s4,	0x5C(t3)
+	\end{lstlisting}
+\end{sol}
+
+\begin{ex}{6.24}
+	Consider all instructions with an immediate field.
+	\begin{enumerate}[label=(\alph*)]
+		\item Which instructions from Exercise 6.22 use an immediate field in
+		their machine code format?
+		\item What is the instruction type (I-, S-, B-, U-, or J-type) for the
+		instructions from part (a)?
+		\item Write out the 5- to 21-bit  immediates of each instruction from part
+		(a) in hexadecimal. If the number is extended, also write them as 32-bit
+		extended immediates. Otherwise, indicate that they are not extended.
+	\end{enumerate}
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item The following instructions in Exercise 6.22 use an immediate field
+		in their machine code format:
+		\begin{lstlisting}[language={}]
+addi	s3,	s4,	28
+srli	s3,	s1,	14
+sw		s9,	16(t4)
+		\end{lstlisting}
+		\item The \texttt{addi} and \texttt{srli} instruction are of $I$-type,
+		and the \texttt{sw} instruction is of $S$-type.
+		\item
+		\
+		\begin{lstlisting}[language={}]
+0x01C	# addi	s3,	s4,	28
+0x00E	# srli	s3,	s1,	14
+0x012	# sw	s9,	16(t4)
+		\end{lstlisting}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.25}
+	Repeat Exercise 6.24 for  the instructions in Exercise 6.23.
+\end{ex}
+
+\begin{sol}
+	\
+	\begin{enumerate}[label=(\alph*)]
+		\item The following instructions in Exercise 6.23 use an immediate field
+		in their machine code format:
+		\begin{lstlisting}[language={}]
+srai	t0,	t1,	0xC
+ori		s3,	s1,	0xABC
+lw		s4,	0x5C(t3)
+		\end{lstlisting}
+		\item All three instructions are of $I$-type.
+		\item
+		\
+		\begin{lstlisting}[language={}]
+0x00C		# srai	t0, t1, 0xC
+0xFFFFFABC	# ori	s3,	s1,	0xABC
+0x04C		# lw	s4,	0x5C(t3)
+		\end{lstlisting}
+	\end{enumerate}
+\end{sol}
+
+\begin{ex}{6.26}
+	Consider the RISC-V machine code snippet below. The first instruction is listed at
+	the top.
+	\begin{lstlisting}[language={}]
+		0x01800513
+		0x00300593
+		0x00000393
+		0x00058E33
+		0x01C54863
+		0x00138393
+		0x00BE0E33
+		0xFF5FF06F
+		0x00038533
+	\end{lstlisting}
+	\begin{enumerate}[label=(\alph*)]
+		\item Convert the machine code snippet into RISC-V assembly language.
+		\item Reverse engineer a high-level program that would compile into this assembly
+		language routine and write it. Clearly comment your code.
+		\item Explain in words what the program does. \texttt{a0} and \texttt{a1} are the
+		inputs, and they initially contain positive numbers $A$ and $B$. At the end of the
+		program, register \texttt{a0} holds the output (i.e., return value).
+	\end{enumerate}
+\end{ex}
+
+\begin{ex}{6.27}
+	Repeat Exercise 6.26 for the following machine code. \texttt{a0} and \texttt{a1} are the
+	inputs. \texttt{a0} contains a 32-bit number and \texttt{a1} is the address of a 32-element
+	array of characters (\texttt{char}).
+	\begin{lstlisting}[language={}]
+		0x01F00393
+		0x00755E33
+		0x001E7E13
+		0x01C580A3
+		0x00158593
+		0xFFF38393
+		0xFE03D6E3
+		0x00008067
+	\end{lstlisting}
+\end{ex}
+
+\begin{ex}{6.28}
+	Convert the following branch instructions into machine code. Instructions addresses are
+	given to the left of each instruction.
+	\begin{enumerate}[label=(\alph*)]
+		\item
+		\
+		\begin{lstlisting}[language={}]
+			0x0000A000			beq	t4,	zero,	Loop
+			0x0000A004			...
+			0x0000A008			...
+			0x0000A00C	Loop:	...
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0x00801000			bne	s5,	a1,		L1
+			...					...
+			0x0080174C	L1:		...
+		\end{lstlisting}
+		\item
+		\
+		\begin{lstlisting}[language={}]
+			0x0000C10C	Back:	...
+			...					...
+			0x0000D000			blt	s1,	s2,	Back
+		\end{lstlisting}
+	\end{enumerate}
+\end{ex}
+
+\begin{ex}{6.29}
+	Convert the following branch instructions into machine code. Instruction addresses
+	are given to the left of each instruction.
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0xAA00E124			blt	t4,	s3,	Loop
+			0xAA00E128			...
+			0xAA00E12C			...
+			0xAA00E130	Loop:	...
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0xC0901000			bge	t1,	t2,	L1
+			...					...
+			0xC090174C			...
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0x1230D10C	Back:	...
+			...					...
+			0x1230D908			bne	s10, s11, Back
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0xAB0C99A8			beq	s0,	s1,	L2
+			...					...
+			0xAB0CA0FC	L2:		...	
+		\end{lstlisting}
+		\item
+		\
+		\begin{lstlisting}[language={}]
+			0xFFABCF04	L3:		...
+			...					...
+			0xFFABD640			blt	s1,	t3,	L3
+		\end{lstlisting}
+	\end{enumerate}
+\end{ex}
+
+\begin{ex}{6.30}
+	Convert the following jump instructions into machine code. Instruction
+	addresses are given to the left of each instruction.
+	\begin{enumerate}[label=(\alph*)]
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0x123ABC0			j	Loop
+			...
+			0x123CABBC	Loop:	...
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0x12345678	Back	...
+			...					...
+			0x123B8760			jal	s0,	Back
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0xAABBCCD0			jal	L1
+			...					...
+			0xAABDCD98	L1:		...
+		\end{lstlisting}
+		\item
+		\
+		\begin{lstlisting}[language={}]
+			0x11223344			j	L2
+			...					...
+			0x1127BCDC	L2:		...
+		\end{lstlisting}
+		\item 
+		\
+		\begin{lstlisting}[language={}]
+			0x9876543C	L3:		...
+			...					...
+			0x9886543C			jal	L3
+		\end{lstlisting}
+	\end{enumerate}
+\end{ex}
+
 \end{document}
